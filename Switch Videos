@@ -1,0 +1,47 @@
+#include <Keyboard.h>
+
+#include <Arduino.h>
+const int TrigPin = 7;
+const int EchoPin = 6;
+const int SensorPin=8;
+double cm;
+int SensorState=0;
+int a=0;
+void setup() {
+pinMode(SensorPin,INPUT);
+Keyboard.begin();//开始键盘通讯
+pinMode(TrigPin, OUTPUT);
+pinMode(EchoPin, INPUT);
+}
+void loop() {
+SensorState = digitalRead(SensorPin);
+if( SensorState ==HIGH) //当按到触摸传感器时
+{
+delay(200);
+++a;
+}
+if(a % 2 != 0)
+{
+delayMicroseconds(2);
+digitalWrite(TrigPin, HIGH);
+delayMicroseconds(10);
+digitalWrite(TrigPin, LOW);
+cm = pulseIn(EchoPin, HIGH) / 58.0; //获取距离，单位是厘米
+cm = (int(cm * 100.0)) / 100.0; //保留小数点后两位
+if(cm<=10.0)
+{
+Keyboard.begin();
+delay(200);
+Keyboard.press(KEY_RIGHT_SHIFT);//按下左control键
+delay(100);
+Keyboard.press(KEY_DOWN_ARROW);//按下右方向键
+delay(100);
+Keyboard.releaseAll();//释放按下的全部按键
+delay(1000);
+}
+}
+else
+{
+Keyboard.end();
+}
+}
